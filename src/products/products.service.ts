@@ -1,4 +1,4 @@
-import { Injectable, InternalServerErrorException } from '@nestjs/common';
+import { BadRequestException, Injectable, InternalServerErrorException, Logger } from '@nestjs/common';
 import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -7,6 +7,8 @@ import { Repository } from 'typeorm';
 
 @Injectable()
 export class ProductsService {
+
+  private readonly logger = new Logger('ProductsService');
 
   constructor(
     
@@ -17,7 +19,7 @@ export class ProductsService {
 
   async create(createProductDto: CreateProductDto) {
 
-    try {
+    try {      
 
       const product = this.productRepository.create(createProductDto); // creo el registro
       await this.productRepository.save(product); // lo guarda en la base de datos
@@ -26,11 +28,20 @@ export class ProductsService {
 
     } catch (error) {
 
-      console.log(error);
-      throw new InternalServerErrorException('Help!');
+      this.handleExcepton(error);
 
     }
     
+  }
+
+  private handleExcepton(error) {
+    if (error.code === '23505') {
+      throw new BadRequestException(error.detail);
+    }
+
+    // console.log(error);
+    this.logger.error(error);
+    throw new InternalServerErrorException('Unexpected error, check server logs');
   }
 
   findAll() {
