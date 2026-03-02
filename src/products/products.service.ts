@@ -67,8 +67,25 @@ export class ProductsService {
 
   }
 
-  update(id: number, updateProductDto: UpdateProductDto) {
-    return `This action updates a #${id} product`;
+  async update(id: string, updateProductDto: UpdateProductDto) {
+
+
+    const product = await this.findOne(id);
+
+    try {
+      // continuar ya funciona, pero quiero mejorarlo
+      await this.productRepository.update(id, updateProductDto)
+      return updateProductDto
+      /*
+      await pokemon.updateOne(updatePokemonDto, {new: true});
+      return { ...pokemon.toJSON(), ...updatePokemonDto };
+      */
+
+    } catch (error) {
+      this.handleExcepton(error)
+    }
+
+    // return `This action updates a #${id} product`;
   }
 
   async remove(id: string) {

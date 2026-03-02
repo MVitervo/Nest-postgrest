@@ -24,7 +24,7 @@ export class CreateProductDto {
     @IsOptional()
     stock?: number;
 
-    @IsString({ each: true }) // esto significa que cada elemento debe de ser string
+    @IsString({ each: true }) // esto significa que cada elemento del array debe de ser string
     @IsArray()
     sizes: string[];
 
