@@ -5,6 +5,8 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Product } from './entities/product.entity';
 import { Repository } from 'typeorm';
 import { paginationDto } from 'src/common/dtos/pagination.dto';
+import { validate as isUUID } from 'uuid';
+import { title } from 'process';
 
 @Injectable()
 export class ProductsService {
@@ -55,8 +57,9 @@ export class ProductsService {
     });
   }
 
-  async findOne(id: string) {
+  async findOne(term: string) {
 
+    /*
     let findProductById = await this.productRepository.findOneBy({ id });
 
     if (!findProductById)
@@ -64,6 +67,27 @@ export class ProductsService {
     
     
     return findProductById;
+    */
+    let product: Product | null = null
+
+    if (isUUID(term)) {
+      product = await this.productRepository.findOneBy({id: term});
+    }
+    else {
+      // product = await this.productRepository.findOneBy({slug: term});
+
+      const queryBuilder = this.productRepository.createQueryBuilder()
+      product = await queryBuilder.where('UPPER(title) = :title or slug = :slug', {
+        title: term.toUpperCase(),
+        slug: term.toLowerCase(),
+      }).getOne() // este getOne sirve para obtener solo un resultado ya que puede regresar mas de 1 regtistro
+    }
+
+    if (!product)
+      throw new NotFoundException(`Product with ${term} not found`);
+    
+    
+    return product;
 
   }
 
