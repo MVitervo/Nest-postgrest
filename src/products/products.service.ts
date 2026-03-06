@@ -93,23 +93,24 @@ export class ProductsService {
 
   async update(id: string, updateProductDto: UpdateProductDto) {
 
+    const product = await this.productRepository.preload({
+      id: id,
+      ...updateProductDto
+    }); // el preload es cargar todas las propiedades
 
-    const product = await this.findOne(id);
+    if (!product)
+      throw new NotFoundException(`Product with id: ${id} not found`)
 
     try {
-      // continuar ya funciona, pero quiero mejorarlo
-      await this.productRepository.update(id, updateProductDto)
-      return updateProductDto
-      /*
-      await pokemon.updateOne(updatePokemonDto, {new: true});
-      return { ...pokemon.toJSON(), ...updatePokemonDto };
-      */
+      await this.productRepository.save(product)
+      return product
 
-    } catch (error) {
+    } catch(error) {
       this.handleExcepton(error)
     }
 
-    // return `This action updates a #${id} product`;
+    return product
+
   }
 
   async remove(id: string) {

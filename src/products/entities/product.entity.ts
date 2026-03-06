@@ -22,7 +22,7 @@ export class Product {
     description: string
 
     @Column('text', {
-        unique: true // se indica que el titulo debe de ser unico
+        unique: true // se indica que el slug debe de ser unico
     })
     slug: string
 
