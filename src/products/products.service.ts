@@ -6,7 +6,6 @@ import { Product } from './entities/product.entity';
 import { Repository } from 'typeorm';
 import { paginationDto } from 'src/common/dtos/pagination.dto';
 import { validate as isUUID } from 'uuid';
-import { title } from 'process';
 
 @Injectable()
 export class ProductsService {
@@ -22,9 +21,12 @@ export class ProductsService {
 
   async create(createProductDto: CreateProductDto) {
 
-    try {      
+    try {
 
-      const product = this.productRepository.create(createProductDto); // creo el registro
+      const product = this.productRepository.create({
+        ...createProductDto,
+        images: []
+      }); // creo el registro
       await this.productRepository.save(product); // lo guarda en la base de datos
 
       return product;
@@ -95,7 +97,8 @@ export class ProductsService {
 
     const product = await this.productRepository.preload({
       id: id,
-      ...updateProductDto
+      ...updateProductDto,
+      images: []
     }); // el preload es cargar todas las propiedades
 
     if (!product)
