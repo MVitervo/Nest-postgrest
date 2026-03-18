@@ -6,6 +6,7 @@ import { Product } from './entities/product.entity';
 import { Repository } from 'typeorm';
 import { paginationDto } from 'src/common/dtos/pagination.dto';
 import { validate as isUUID } from 'uuid';
+import { ProductImage } from './entities';
 
 @Injectable()
 export class ProductsService {
@@ -15,21 +16,27 @@ export class ProductsService {
   constructor(
     
     @InjectRepository(Product)
-    private readonly productRepository: Repository<Product>
+    private readonly productRepository: Repository<Product>,
+
+    @InjectRepository(ProductImage)
+    private readonly productImageRepository: Repository<ProductImage>
 
   ){}
 
   async create(createProductDto: CreateProductDto) {
 
-    try {
+    // aqui los ... es el operador rest
+    const { images = [], ...productDetails } = createProductDto;
 
+    try {
+      // aqui los ... es el operador spread depende de como se usen
       const product = this.productRepository.create({
-        ...createProductDto,
-        images: []
+        ...productDetails,
+        images: images.map(image => this.productImageRepository.create({url: image}))
       }); // creo el registro
       await this.productRepository.save(product); // lo guarda en la base de datos
 
-      return product;
+      return {...product, images};
 
     } catch (error) {
       this.handleExcepton(error);
