@@ -49,7 +49,7 @@ export class Product {
     @OneToMany(
         () =>  ProductImage, // indica que regresa un productimage
         (productImage) => productImage.product, // indica la propiedad con la que se relaciona en la otra entidad
-        {cascade: true} // indica que afecte a la otra tabla al hacer una operacion
+        {cascade: true, eager: true} // indica que afecte a la otra tabla al hacer una operacion
         // por ejemplo la eliminacion de un registro de la tabla product elmina las 
         // imagenes si es que hay
     )
